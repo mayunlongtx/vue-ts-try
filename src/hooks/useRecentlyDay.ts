@@ -26,30 +26,41 @@ export function useRecentlyDay(config?: ConfigType) {
     config,
   );
   const { days, maxHours, minHours, maxMinutes, interval } = defaultConfig;
-  console.log(defaultConfig, 'defaultConfig');
+  // console.log(defaultConfig, 'defaultConfig');
   // 生成近期日期
   function getDay() {
-    let { year, month, day, hour, minute, second } = getNowTime();
+    let { year, month: nowMonth, day: nowDay, hour, minute, second } = getNowTime();
     if (whetherApply()) {
-      day += 1;
+      nowDay += 1;
     }
     let dayList: Time[] = [];
+    // console.log(getDaysOfMonth(year, month));
+    const maxDay = getDaysOfMonth(year, nowMonth);
+    nowMonth = addZero(Number(nowMonth));
     for (let i = 0; i < days; i++) {
       // TODO: 这里缺少了每月最大天数判断 超过当前月最大天数要判断去到下个月 不然会出现天数异常问题
-      let nowDay = day + i;
-      let { week } = getNowTime(`${year}-${month}-${nowDay} ${hour}:${minute}:${second}`);
+      // 计算需要的天数
+      // 判断当前的天 是不是已经大于了最大天数
+      if (nowDay == maxDay) {
+        nowMonth = addZero(Number(nowMonth) + 1);
+        nowDay = 0;
+      }
+      nowDay = addZero(Number(nowDay) + 1);
+      let { week } = getNowTime(`${year}-${nowMonth}-${nowDay} ${hour}:${minute}:${second}`);
 
       // 生成 children
       let children: Item[] = generateHour(nowDay);
       dayList.push({
-        id: `${year}${month}${nowDay}`,
+        id: `${year}${nowMonth}${nowDay}`,
         pId: '0',
-        text: calculateDayName(nowDay, week, `${month}-${nowDay}`),
+        text: calculateDayName(nowDay, week, `${nowMonth} - ${nowDay}`),
         children: <any>children,
       });
     }
     return dayList;
   }
+  // 这里生成需要的所有天数组
+  function generateDays() {}
   // 生成时间
   function generateHour(nowDay: any, time?: any) {
     let { year, month, day, hour } = getNowTime();
@@ -61,7 +72,7 @@ export function useRecentlyDay(config?: ConfigType) {
     hour = nowDay > day ? minHours : hour;
     // 生成当前时间 至 18:00 时间
     for (let i: any = hour; i < maxHours + 1; i++) {
-      i = i < 10 ? '0' + i : i;
+      i = addZero(i);
       list.push({
         id: `${nowDay}${i}00`,
         pId: `${year}${month}${nowDay}`,
@@ -89,7 +100,6 @@ export function useRecentlyDay(config?: ConfigType) {
         _str = value;
         break;
     }
-    console.log(week, 'week');
     return `${_str} (${calculateWeekName(week)})`;
   }
   // 计算周几
@@ -136,11 +146,11 @@ export function useRecentlyDay(config?: ConfigType) {
     let hour: string | number = date.getHours();
     let minute: string | number = date.getMinutes();
     let second: string | number = date.getSeconds();
-    month = month < 10 ? '0' + month : month;
-    day = day < 10 ? '0' + day : day;
-    hour = hour < 10 ? '0' + hour : hour;
-    minute = minute < 10 ? '0' + minute : minute;
-    second = second < 10 ? '0' + second : second;
+    // month = month < 10 ? '0' + month : month;
+    // day = day < 10 ? '0' + day : day;
+    // hour = hour < 10 ? '0' + hour : hour;
+    // minute = minute < 10 ? '0' + minute : minute;
+    // second = second < 10 ? '0' + second : second;
     return {
       year,
       month,
@@ -150,6 +160,19 @@ export function useRecentlyDay(config?: ConfigType) {
       minute,
       second,
     };
+  }
+  // 计算字符串是否小于 10
+  function addZero(value: any) {
+    return value < 10 ? `0${value}` : value;
+  }
+  /**
+   * 获取某个月的总天数
+   *
+   */
+  function getDaysOfMonth(year: any, month: any) {
+    var date = new Date(year, month, 0);
+    var days = date.getDate();
+    return days;
   }
   return {
     getDay,
