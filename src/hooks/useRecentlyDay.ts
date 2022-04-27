@@ -1,18 +1,19 @@
-interface Item {
+export interface TimeItem {
   id: string;
   pId: string;
   text: string;
+  time?: string;
 }
-interface Time extends Item {
-  children: Item[];
+export interface Time extends TimeItem {
+  children: TimeItem[];
 }
 
-interface ConfigType {
-  days: number;
-  maxHours: number;
-  minHours: number;
-  maxMinutes: number;
-  interval: number;
+export interface ConfigType {
+  days?: number;
+  maxHours?: number;
+  minHours?: number;
+  maxMinutes?: number;
+  interval?: number;
 }
 export function useRecentlyDay(config?: ConfigType) {
   const defaultConfig: ConfigType = Object.assign(
@@ -26,9 +27,9 @@ export function useRecentlyDay(config?: ConfigType) {
     config,
   );
   const { days, maxHours, minHours, maxMinutes, interval } = defaultConfig;
-  // console.log(defaultConfig, 'defaultConfig');
   // 生成近期日期
   function getDay() {
+    const allDays = days || 7;
     let { year, month: nowMonth, day: nowDay, hour, minute, second } = getNowTime();
     if (whetherApply()) {
       nowDay += 1;
@@ -37,19 +38,22 @@ export function useRecentlyDay(config?: ConfigType) {
     // console.log(getDaysOfMonth(year, month));
     const maxDay = getDaysOfMonth(year, nowMonth);
     nowMonth = addZero(Number(nowMonth));
-    for (let i = 0; i < days; i++) {
-      // TODO: 这里缺少了每月最大天数判断 超过当前月最大天数要判断去到下个月 不然会出现天数异常问题
-      // 计算需要的天数
-      // 判断当前的天 是不是已经大于了最大天数
+    for (let i = 0; i < allDays; i++) {
       if (nowDay == maxDay) {
         nowMonth = addZero(Number(nowMonth) + 1);
         nowDay = 0;
       }
-      nowDay = addZero(Number(nowDay) + 1);
+      // 如果是今天就不进行添加？
+      if (!whetherApply() && i === 0) {
+      } else {
+        nowDay = addZero(Number(nowDay) + 1);
+      }
+
+      console.log(nowDay, whetherApply());
       let { week } = getNowTime(`${year}-${nowMonth}-${nowDay} ${hour}:${minute}:${second}`);
 
       // 生成 children
-      let children: Item[] = generateHour(nowDay);
+      let children: TimeItem[] = generateHour(nowDay);
       dayList.push({
         id: `${year}${nowMonth}${nowDay}`,
         pId: '0',
@@ -59,24 +63,33 @@ export function useRecentlyDay(config?: ConfigType) {
     }
     return dayList;
   }
-  // 这里生成需要的所有天数组
-  function generateDays() {}
   // 生成时间
   function generateHour(nowDay: any, time?: any) {
-    let { year, month, day, hour } = getNowTime();
-    let list: Item[] = [];
+    const nowInterval = interval || 2;
+    const nowMaxHours = maxHours || 18;
+    let { year, month, day, hour, minute } = getNowTime();
+    let list: TimeItem[] = [];
     // 当前时间 往后顺延两小时
     // 规则：
     //      1. 如果当前时间大于16点30分，则无预约时间
     //      2. 如果当前时间小于16点30分，则当天的时间往后顺延两小时 最大不能超过 18:00
-    hour = nowDay > day ? minHours : hour;
+    // hour = nowDay > day ? minHours : Number(hour) + nowInterval;
+    if (nowDay > day) {
+      hour = minHours;
+    } else if (minute >= maxMinutes) {
+      hour = Number(hour) + nowInterval + 1;
+    } else {
+      hour = Number(hour) + nowInterval;
+    }
+
     // 生成当前时间 至 18:00 时间
-    for (let i: any = hour; i < maxHours + 1; i++) {
+    for (let i: any = Number(hour); i < nowMaxHours + 1; i++) {
       i = addZero(i);
       list.push({
         id: `${nowDay}${i}00`,
         pId: `${year}${month}${nowDay}`,
         text: `${i}:00`,
+        time: `${year}-${addZero(month)}-${addZero(nowDay)} ${i}:00:00`,
       });
     }
     return list;
@@ -85,7 +98,7 @@ export function useRecentlyDay(config?: ConfigType) {
   function calculateDayName(nowDay: number, week: number, value?: any) {
     const { day } = getNowTime();
     let _str = value;
-    const difference = day - nowDay;
+    const difference = nowDay - day;
     switch (difference) {
       case 0:
         _str = '今天';
@@ -126,11 +139,11 @@ export function useRecentlyDay(config?: ConfigType) {
   // 判断今天是否还可以预约
   function whetherApply(hour: number = 19, minute: number = 30) {
     const { hour: nowHour, minute: nowMinute } = getNowTime();
-    console.log(nowHour, maxHours);
     if (nowHour > maxHours) {
       return true;
-    } else if (Number(nowHour) + interval === hour) {
-      console.log('我是不是走的这里');
+    } else if (Number(nowHour) + interval > maxHours) {
+      return true;
+    } else if (Number(nowHour) + interval === maxHours) {
       return nowMinute > maxMinutes;
     } else {
       return false;
@@ -143,7 +156,7 @@ export function useRecentlyDay(config?: ConfigType) {
     let month: string | number = date.getMonth() + 1;
     const week: number = date.getDay();
     let day: any = date.getDate();
-    let hour: string | number = date.getHours();
+    let hour: any = date.getHours();
     let minute: string | number = date.getMinutes();
     let second: string | number = date.getSeconds();
     // month = month < 10 ? '0' + month : month;
