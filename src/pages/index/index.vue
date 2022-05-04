@@ -17,7 +17,7 @@
     </div>
     <!-- 推荐  -->
     <transition name="van-fade">
-      <Recommended v-if="active == 0"></Recommended>
+      <Recommended v-if="active == 0" v-dev-tips></Recommended>
     </transition>
   </div>
 </template>

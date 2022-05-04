@@ -30,13 +30,14 @@ export function useRecentlyDay(config?: ConfigType) {
   // 生成近期日期
   function getDay() {
     const allDays = days || 7;
-    let { year, month: nowMonth, day: nowDay, hour, minute, second } = getNowTime();
+    let { year: nowYear, month: nowMonth, day: nowDay, hour, minute, second } = getNowTime();
     if (whetherApply()) {
       nowDay += 1;
     }
     let dayList: Time[] = [];
     // console.log(getDaysOfMonth(year, month));
-    const maxDay = getDaysOfMonth(year, nowMonth);
+    const maxDay = getDaysOfMonth(nowYear, nowMonth);
+    // 判断是不是超出了今年如果超出了就加一年 月份初始化为1 日期初始化为1
     nowMonth = addZero(Number(nowMonth));
     for (let i = 0; i < allDays; i++) {
       if (nowDay == maxDay) {
@@ -49,13 +50,12 @@ export function useRecentlyDay(config?: ConfigType) {
         nowDay = addZero(Number(nowDay) + 1);
       }
 
-      console.log(nowDay, whetherApply());
-      let { week } = getNowTime(`${year}-${nowMonth}-${nowDay} ${hour}:${minute}:${second}`);
+      let { week } = getNowTime(`${nowYear}-${nowMonth}-${nowDay} ${hour}:${minute}:${second}`);
 
       // 生成 children
-      let children: TimeItem[] = generateHour(nowDay);
+      let children: TimeItem[] = generateHour(nowYear, nowDay, nowMonth);
       dayList.push({
-        id: `${year}${nowMonth}${nowDay}`,
+        id: `${nowYear}${nowMonth}${nowDay}`,
         pId: '0',
         text: calculateDayName(nowDay, week, `${nowMonth} - ${nowDay}`),
         children: <any>children,
@@ -64,7 +64,7 @@ export function useRecentlyDay(config?: ConfigType) {
     return dayList;
   }
   // 生成时间
-  function generateHour(nowDay: any, time?: any) {
+  function generateHour(nowYear: any, nowDay: any, nowMonth: any, time?: any) {
     const nowInterval = interval || 2;
     const nowMaxHours = maxHours || 18;
     let { year, month, day, hour, minute } = getNowTime();
@@ -74,7 +74,7 @@ export function useRecentlyDay(config?: ConfigType) {
     //      1. 如果当前时间大于16点30分，则无预约时间
     //      2. 如果当前时间小于16点30分，则当天的时间往后顺延两小时 最大不能超过 18:00
     // hour = nowDay > day ? minHours : Number(hour) + nowInterval;
-    if (nowDay > day) {
+    if (nowYear > year || nowMonth > month || Number(nowDay) > day) {
       hour = minHours;
     } else if (minute >= maxMinutes) {
       hour = Number(hour) + nowInterval + 1;
@@ -87,9 +87,10 @@ export function useRecentlyDay(config?: ConfigType) {
       i = addZero(i);
       list.push({
         id: `${nowDay}${i}00`,
-        pId: `${year}${month}${nowDay}`,
+        pId: `${nowYear}${addZero(nowMonth)}${addZero(nowDay)}`,
         text: `${i}:00`,
-        time: `${year}-${addZero(month)}-${addZero(nowDay)} ${i}:00:00`,
+        // :00
+        time: `${nowYear}-${nowMonth}-${nowDay} ${i}:00`,
       });
     }
     return list;

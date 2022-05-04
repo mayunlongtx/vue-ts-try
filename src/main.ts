@@ -5,10 +5,12 @@ import "./styles/index.scss";
 import "amfe-flexible";
 import App from "./App.vue";
 import { Button, NavBar, Tabbar, TabbarItem, Icon, Sticky } from "vant";
+import directives from "./directive/index";
 
 const app = createApp(App);
 app
   .use(router)
+  .use(directives)
   .use(Button)
   .use(NavBar)
   .use(Tabbar)
