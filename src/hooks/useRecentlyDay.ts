@@ -1,8 +1,11 @@
+import { Toast } from 'vant';
+
 export interface TimeItem {
   id: string;
   pId: string;
   text: string;
   time?: string;
+  label?: string;
 }
 export interface Time extends TimeItem {
   children: TimeItem[];
@@ -31,9 +34,9 @@ export function useRecentlyDay(config?: ConfigType) {
   function getDay() {
     const allDays = days || 7;
     let { year: nowYear, month: nowMonth, day: nowDay, hour, minute, second } = getNowTime();
-    if (whetherApply()) {
-      nowDay += 1;
-    }
+    // if (whetherApply()) {
+    //   nowDay += 1;
+    // }
     let dayList: Time[] = [];
     // console.log(getDaysOfMonth(year, month));
     const maxDay = getDaysOfMonth(nowYear, nowMonth);
@@ -50,14 +53,14 @@ export function useRecentlyDay(config?: ConfigType) {
         nowDay = addZero(Number(nowDay) + 1);
       }
 
-      let { week } = getNowTime(`${nowYear}-${nowMonth}-${nowDay} ${hour}:${minute}:${second}`);
+      let { week } = getNowTime(`${nowYear}-${nowMonth}-${nowDay}`);
 
       // 生成 children
       let children: TimeItem[] = generateHour(nowYear, nowDay, nowMonth);
       dayList.push({
         id: `${nowYear}${nowMonth}${nowDay}`,
         pId: '0',
-        text: calculateDayName(nowDay, week, `${nowMonth} - ${nowDay}`),
+        text: calculateDayName(nowDay, week, true, `${nowMonth} - ${nowDay}`),
         children: <any>children,
       });
     }
@@ -84,19 +87,24 @@ export function useRecentlyDay(config?: ConfigType) {
 
     // 生成当前时间 至 18:00 时间
     for (let i: any = Number(hour); i < nowMaxHours + 1; i++) {
+      const { week } = getNowTime(
+        `${nowYear}-${addZero(nowMonth)}-${addZero(nowDay)} ${i}:${minute}:00`,
+      );
       i = addZero(i);
+      let label = `${calculateDayName(nowDay, week, false, `${nowMonth}-${nowDay}`)} ${i}:00`;
       list.push({
         id: `${nowDay}${i}00`,
         pId: `${nowYear}${addZero(nowMonth)}${addZero(nowDay)}`,
         text: `${i}:00`,
         // :00
         time: `${nowYear}-${nowMonth}-${nowDay} ${i}:00`,
+        label,
       });
     }
     return list;
   }
   // 计算今天、明天、后天
-  function calculateDayName(nowDay: number, week: number, value?: any) {
+  function calculateDayName(nowDay: number, week: number, showWeek: boolean = true, value?: any) {
     const { day } = getNowTime();
     let _str = value;
     const difference = nowDay - day;
@@ -114,7 +122,8 @@ export function useRecentlyDay(config?: ConfigType) {
         _str = value;
         break;
     }
-    return `${_str} (${calculateWeekName(week)})`;
+    const weekName = ` (${calculateWeekName(week)})`;
+    return `${_str}${showWeek ? weekName : ''}`;
   }
   // 计算周几
   function calculateWeekName(week: number) {
