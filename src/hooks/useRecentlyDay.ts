@@ -34,17 +34,13 @@ export function useRecentlyDay(config?: ConfigType) {
   function getDay() {
     const allDays = days || 7;
     let { year: nowYear, month: nowMonth, day: nowDay, hour, minute, second } = getNowTime();
-    // if (whetherApply()) {
-    //   nowDay += 1;
-    // }
     let dayList: Time[] = [];
-    // console.log(getDaysOfMonth(year, month));
     const maxDay = getDaysOfMonth(nowYear, nowMonth);
     // 判断是不是超出了今年如果超出了就加一年 月份初始化为1 日期初始化为1
-    nowMonth = addZero(Number(nowMonth));
+    nowMonth = addZero(nowMonth);
     for (let i = 0; i < allDays; i++) {
       if (nowDay == maxDay) {
-        nowMonth = addZero(Number(nowMonth) + 1);
+        nowMonth = addZero(nowMonth + 1);
         nowDay = 0;
       }
       // 如果是今天就不进行添加？
@@ -52,9 +48,12 @@ export function useRecentlyDay(config?: ConfigType) {
       } else {
         nowDay = addZero(Number(nowDay) + 1);
       }
-
-      let { week } = getNowTime(`${nowYear}-${nowMonth}-${nowDay}`);
-
+      const weekDay = nowDay;
+      let { week } = getNowTime(`${nowYear}-${nowMonth}-${addZero(weekDay)}`);
+      // Toast({
+      //   message: `${nowYear}-${nowMonth}-${addZero(nowDay)}`,
+      //   duration: 0,
+      // });
       // 生成 children
       let children: TimeItem[] = generateHour(nowYear, nowDay, nowMonth);
       dayList.push({
@@ -97,7 +96,7 @@ export function useRecentlyDay(config?: ConfigType) {
         pId: `${nowYear}${addZero(nowMonth)}${addZero(nowDay)}`,
         text: `${i}:00`,
         // :00
-        time: `${nowYear}-${nowMonth}-${nowDay} ${i}:00`,
+        time: `${nowYear}-${nowMonth}-${addZero(nowDay)} ${i}:00:00`,
         label,
       });
     }
@@ -106,6 +105,10 @@ export function useRecentlyDay(config?: ConfigType) {
   // 计算今天、明天、后天
   function calculateDayName(nowDay: number, week: number, showWeek: boolean = true, value?: any) {
     const { day } = getNowTime();
+    // Toast({
+    //   message: `${nowDay} ${week}`,
+    //   duration: 0,
+    // })
     let _str = value;
     const difference = nowDay - day;
     switch (difference) {
@@ -186,6 +189,7 @@ export function useRecentlyDay(config?: ConfigType) {
   }
   // 计算字符串是否小于 10
   function addZero(value: any) {
+    value = Number(value);
     return value < 10 ? `0${value}` : value;
   }
   /**
