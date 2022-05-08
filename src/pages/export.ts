@@ -1,10 +1,15 @@
 let moduleFiles = import.meta.globEager("./**/*.vue");
+//   ignore: [],
+
 let modules: any = {};
 let routes: any = [];
 
 for (const key in moduleFiles) {
   const module = moduleFiles[key];
-  modules[key.replace(/(\.\/modules\/|\.js)/g, "")] = module.default;
+  // 这里是为了过滤掉 单独的组件
+  if (key.indexOf("/components/") == -1) {
+    modules[key.replace(/(\.\/modules\/|\.js)/g, "")] = module.default;
+  }
 }
 
 Object.keys(modules).forEach((item) => {
