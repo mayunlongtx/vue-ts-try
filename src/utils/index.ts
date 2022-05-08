@@ -1,11 +1,15 @@
-import { imgFilePath } from "@/config/enum";
+// import { imgFilePath } from "@/config/enum";
 
-export function getImgFile(enumName: string) {
-  console.log(getImgFilePath(enumName.toUpperCase()));
-  //   let imgFiles = import.meta.globEager(getImgFilePath(enumName) + "/*.png");
-  //   console.log(imgFiles);
+export function getImgFile(imgFiles: any) {
+  const imgs: any = {};
+  for (const key in imgFiles) {
+    const newKey = key.slice(key.lastIndexOf("/") + 1, key.indexOf(".png"));
+    console.log(newKey, "newKey");
+    imgs[newKey] = imgFiles[key].default;
+  }
+  return imgs;
 }
-export function getImgFilePath(enumName: string) {
-  console.log(enumName);
-  return imgFilePath[enumName];
-}
+
+// export function getImgFilePath(enumName: string) {
+//   return imgFilePath[enumName];
+// }

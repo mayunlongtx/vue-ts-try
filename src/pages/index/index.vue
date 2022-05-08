@@ -13,11 +13,13 @@
           <div class="slide-block" v-if="active == tab.value"></div>
         </div>
       </div>
-      <van-icon name="search" size="30" />
+      <van-icon name="search" size="30" class="custom-search" v-dev-tips />
     </div>
     <!-- 推荐  -->
     <transition name="van-fade">
-      <Recommended v-if="active == 0" v-dev-tips></Recommended>
+      <div class="container">
+        <Recommended v-if="active == 0"></Recommended>
+      </div>
     </transition>
   </div>
 </template>
@@ -55,13 +57,17 @@ function handleTab(index: number) {
     #ffffff 66%,
     #ffffff 100%
   );
-
+  .container {
+    height: 90%;
+    overflow: auto;
+  }
   .home-top {
     padding: 10px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     .home-tab {
+      flex: 10%;
       height: 60px;
       display: flex;
       align-items: center;
@@ -69,7 +75,7 @@ function handleTab(index: number) {
       .home-tab_item {
         color: rgba(0, 0, 0, 0.6);
         font-size: 15px;
-        margin: 0 10px;
+        // padding: 0 10px;
         line-height: 30px;
         // animation: auto-font 1s;
 
@@ -88,6 +94,10 @@ function handleTab(index: number) {
         font-weight: bold;
         // border:;
       }
+    }
+    .custom-search {
+      flex: 1;
+      text-align: right;
     }
   }
 }
