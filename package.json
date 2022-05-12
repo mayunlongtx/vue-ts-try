@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "amfe-flexible": "^2.2.1",
+    "axios": "^0.27.2",
     "docx-preview": "^0.1.9",
     "sass": "^1.50.0",
     "vant": "^3.4.7",
