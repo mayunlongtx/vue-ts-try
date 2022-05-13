@@ -12,9 +12,9 @@ onMounted(() => {
 <template>
   <router-view />
 
-  <van-sticky>
+  <!-- <van-sticky>
     <Tabbar></Tabbar>
-  </van-sticky>
+  </van-sticky> -->
 </template>
 
 <style></style>
