@@ -22,12 +22,22 @@
       </div>
     </transition>
   </div>
+  <van-sticky>
+    <TabBar></TabBar>
+  </van-sticky>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Recommended from "./components/recommended.vue";
+import TabBar from "@/components/Tabbar/index.vue";
+type tabBarCtx = InstanceType<typeof TabBar>;
 let active = ref(0);
+
+let tabBar = ref<null | tabBarCtx>(null);
+onMounted(() => {
+  console.log(tabBar.value);
+});
 const tabList = [
   {
     value: 0,
