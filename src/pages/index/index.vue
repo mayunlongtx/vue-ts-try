@@ -58,6 +58,7 @@ function handleTab(index: number) {
 </script>
 
 <style scoped lang="scss">
+$padding-left: 16px;
 .home-container {
   height: calc(100vh - 56px);
   background: linear-gradient(
@@ -72,7 +73,7 @@ function handleTab(index: number) {
     overflow: auto;
   }
   .home-top {
-    padding: 10px 32px;
+    padding: 10px $padding-left;
     display: flex;
     align-items: center;
     justify-content: space-between;

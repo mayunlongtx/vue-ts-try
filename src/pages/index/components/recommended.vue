@@ -95,8 +95,9 @@ console.log(tabList);
 </script>
 
 <style scoped lang="scss">
+$padding-left: 16px;
 .p-l-32 {
-  padding-left: 32px;
+  padding:0 $padding-left;
 }
 .recommended-container {
   height: calc(100vh - 210px);
