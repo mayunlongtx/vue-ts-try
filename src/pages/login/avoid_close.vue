@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="avoid-close" @click="handlePath">
-      免密登录<van-icon name="arrow" class="arrow" />
+      密码登录<van-icon name="arrow" class="arrow" />
     </div>
     <div class="title">欢迎来到柚知设计</div>
     <div class="form-container">
@@ -11,22 +11,17 @@
           <input type="password" class="hide-input" />
           <van-field
             v-model="username"
-            placeholder="手机/用户名/邮箱"
-            :rules="[{ required: true, message: '请填写手机/用户名/邮箱' }]"
+            placeholder="请输入手机号"
+            :rules="[{ required: true, message: '请输入手机号' }]"
           />
-          <van-field
-            v-model="password"
-            type="password"
-            placeholder="请输入密码"
-            :rules="[{ required: true, message: '请输入密码' }]"
-          />
-          <div class="forgot-password" v-dev-tips>忘记密码</div>
         </van-cell-group>
         <div class="btns">
-          <div class="btn" native-type="submit">登录</div>
+          <div class="btn" native-type="submit">获取验证码</div>
         </div>
         <!-- 注册 -->
-        <div class="registered">还没有账号？<span>立即注册</span></div>
+        <div class="registered">
+          注册即表示接受<span>《版本声明》</span><span>《隐私保护》</span>
+        </div>
       </van-form>
     </div>
     <van-divider
@@ -46,10 +41,11 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
+
 const username = ref("");
 const password = ref("");
 function handlePath() {
-  router.replace("/login/avoid_close");
+  router.replace("/login");
 }
 const onSubmit = (values: any) => {
   console.log("submit", values);
@@ -156,10 +152,10 @@ const onSubmit = (values: any) => {
     }
     // 注册
     .registered {
-      width: 38%;
+      width: 78%;
       margin: 35px auto;
-      font-size: 14px;
       text-align: center;
+      font-size: 13px;
       font-family: PingFangSC-Regular, PingFang SC;
       color: #77797c;
       line-height: 20px;
