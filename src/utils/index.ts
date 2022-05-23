@@ -4,7 +4,6 @@ export function getImgFile(imgFiles: any) {
   const imgs: any = {};
   for (const key in imgFiles) {
     const newKey = key.slice(key.lastIndexOf("/") + 1, key.indexOf(".png"));
-    console.log(newKey, "newKey");
     imgs[newKey] = imgFiles[key].default;
   }
   return imgs;

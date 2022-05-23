@@ -91,7 +91,6 @@ const tabList: Array<tabs> = [
     label: "专题",
   },
 ];
-console.log(tabList);
 </script>
 
 <style scoped lang="scss">
