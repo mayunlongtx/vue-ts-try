@@ -42,6 +42,7 @@ export function formatDate(date: any, fmt: any) {
   return fmt;
 }
 
+// TODO: 测试提交
 // export function getImgFilePath(enumName: string) {
 //   return imgFilePath[enumName];
 // }
